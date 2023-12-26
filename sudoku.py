@@ -8,11 +8,9 @@ rows = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I']
 peerMap = {}
 colMap = {}
 rowMap = {}
-boxMap = {}
+boxMap = {n: [] for n in range(1, 10)}
 
-for n in range(1, 10):
-    boxMap[n] = []
-
+# got this online somewhere because I wanted to print in place
 def printTest():
     for i in range(101):
         # time.sleep(0.01)
@@ -78,47 +76,6 @@ def generateBoard():
     
     setPeers(gameBoard)
     return gameBoard
-    
-# Generate random first column and row
-def seedGame(gameBoard):
-    nums = list(range(1, 10))
-    random.shuffle(nums)
-
-    # Populate top left 3x3 randomly
-    i = 0
-    for r in range(3):
-        for c in range(3):
-            cell = rows[r] + str(cols[c])
-            gameBoard[cell] = nums[i]
-            i = i + 1
-
-    rowNums = nums.copy()
-    rowNums[3:] = random.sample(rowNums[3:], len(rowNums[3:]))
-   
-    # Populate first row - A
-    for c in cols:
-        cell = rows[0] + str(c)
-        gameBoard[cell] = rowNums[c - 1]
-
-    nums.remove(gameBoard['A1'])
-    nums.remove(gameBoard['B1'])
-    nums.remove(gameBoard['C1'])
-    colNums = list()
-    colNums.append(gameBoard['A1'])
-    colNums.append(gameBoard['B1'])
-    colNums.append(gameBoard['C1'])
-    colNums.extend(nums)
-    colNums[3:] = random.sample(colNums[3:], len(colNums[3:]))
-
-    # Populate first column - 1
-    i = 0
-    for r in rows:
-        cell = r + str(cols[0])
-        gameBoard[cell] = colNums[i]
-        i = i + 1
-    
-    return gameBoard
-
 
 def possibleVals(cell):
     vals = list(range(1, 10))
@@ -132,29 +89,39 @@ def possibleVals(cell):
     print(vals)
     return vals
 
+def peerVals(cell):
+    vals = []
+    for c in peerMap[cell]:
+        vals.append(gameBoard[c])
+    
+    vals = set(vals)
+    return vals
+
+def fullBoard(gameBoard):
+    for c in gameBoard:
+        if gameBoard[c] == 0:
+            return False
+
+    return True
+
 def fillBoard(gameBoard):
     nums = list(range(1, 10))
     
     for cell in gameBoard:
-        random.shuffle(nums)
-        # n = 0
-        # while True:
         if gameBoard[cell] == 0:
-            gameBoard[cell] = possibleVals(cell)[0]
-            # else:
-            #     if n < 8:
-            #         n = n + 1
-            #     else:
-            #         n = 0
-            # print(n)
-            # print('[%d]\r'%n, end="")
+            random.shuffle(nums)
+            for n in nums:
+                if n not in peerVals(cell):
+                    gameBoard[cell] = n
 
-        printBoardV(gameBoard)
-        print()
+                    if fullBoard(gameBoard):
+                        return True
+                    elif fillBoard(gameBoard):
+                        return True
+            break
 
-    # return gameBoard
 
-def printBoardV(gameBoard):
+def printBoardNums(gameBoard):
     rowNr = 0
 
     for r in rows:
@@ -170,6 +137,8 @@ def printBoardV(gameBoard):
                         print(' +', end = '')
             cell = r + str(c)
             print(' ' + str(gameBoard[cell]), end = '')
+            if(c == 9):
+                print("\t%c" %r, end = '')
 
             if(c == 9):
                 print()
@@ -177,7 +146,9 @@ def printBoardV(gameBoard):
 
             elif(c % 3 == 0):
                 print(' |', end = '')
-def printBoardK(gameBoard):
+            
+
+def printBoardKeys(gameBoard):
     rowNr = 0
 
     for r in rows:
@@ -202,9 +173,7 @@ def printBoardK(gameBoard):
                 print(' |', end = '')
         
 if __name__ == "__main__":
-    # printTest()
     gameBoard = generateBoard()
-    seedGame(gameBoard)
     
     # for n in rowMap:
     #     print(n, ': ', rowMap[n])
@@ -218,14 +187,12 @@ if __name__ == "__main__":
     # for n in peerMap:
     #     print(n, ': ', peerMap[n])
 
-    # printBoardK(gameBoard)
+    printBoardKeys(gameBoard)
     print()
     fillBoard(gameBoard)
-    printBoardV(gameBoard)
-    # populateBoard(gameBoard)
-    # if validateBoard(gameBoard) == 'err_size':
-    #     print("err_size")
-    #     exit 
+    while not fullBoard(gameBoard):
+        gameBoard = generateBoard()
+        fillBoard(gameBoard)
 
-    # prepBoard(gameBoard)
+    printBoardNums(gameBoard)
     
