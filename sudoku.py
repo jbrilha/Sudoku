@@ -119,6 +119,41 @@ def seedGame(gameBoard):
     
     return gameBoard
 
+
+def possibleVals(cell):
+    vals = list(range(1, 10))
+
+    for c in peerMap[cell]:
+        if gameBoard[c] in vals:
+            vals.remove(gameBoard[c])
+        # print(gameBoard[c])
+        # pass
+    random.shuffle(vals)
+    print(vals)
+    return vals
+
+def fillBoard(gameBoard):
+    nums = list(range(1, 10))
+    
+    for cell in gameBoard:
+        random.shuffle(nums)
+        # n = 0
+        # while True:
+        if gameBoard[cell] == 0:
+            gameBoard[cell] = possibleVals(cell)[0]
+            # else:
+            #     if n < 8:
+            #         n = n + 1
+            #     else:
+            #         n = 0
+            # print(n)
+            # print('[%d]\r'%n, end="")
+
+        printBoardV(gameBoard)
+        print()
+
+    # return gameBoard
+
 def printBoardV(gameBoard):
     rowNr = 0
 
@@ -142,7 +177,6 @@ def printBoardV(gameBoard):
 
             elif(c % 3 == 0):
                 print(' |', end = '')
-
 def printBoardK(gameBoard):
     rowNr = 0
 
@@ -169,7 +203,8 @@ def printBoardK(gameBoard):
         
 if __name__ == "__main__":
     # printTest()
-    gameBoard = seedGame(generateBoard())
+    gameBoard = generateBoard()
+    seedGame(gameBoard)
     
     # for n in rowMap:
     #     print(n, ': ', rowMap[n])
@@ -179,8 +214,13 @@ if __name__ == "__main__":
     # print()
     # for n in boxMap:
     #     print(n, ': ', boxMap[n])
-    printBoardK(gameBoard)
+    # print()
+    # for n in peerMap:
+    #     print(n, ': ', peerMap[n])
+
+    # printBoardK(gameBoard)
     print()
+    fillBoard(gameBoard)
     printBoardV(gameBoard)
     # populateBoard(gameBoard)
     # if validateBoard(gameBoard) == 'err_size':
